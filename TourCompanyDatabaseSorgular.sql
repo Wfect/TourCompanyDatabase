@@ -1,37 +1,37 @@
 -RAPORLAR
 
---1.En çok gezilen yer/yerler neresidir?
+--1.En Ã§ok gezilen yer/yerler neresidir?
 SELECT TOP 1 BolgeAdi, COUNT(BolgeID1) + COUNT(BolgeID2) + COUNT(BolgeID3) as TotalVisits
 FROM SatislarTablosu
 JOIN Bolgeler ON (Bolgeler.BolgeID = SatislarTablosu.BolgeID1 OR Bolgeler.BolgeID = SatislarTablosu.BolgeID2 OR Bolgeler.BolgeID = SatislarTablosu.BolgeID3)
 GROUP BY  BolgeAdi
 ORDER BY TotalVisits DESC
---2.Aðustos ayýnda en çok çalýþan rehber/rehberler kimdir/kimlerdir?
+--2.Agustos ayinda en Ã§ok Ã§alisan rehber/rehberler kimdir/kimlerdir?
 SELECT TOP 1 Rehberler.RehberAdi, COUNT(*) as CalismaSayisi FROM SatislarTablosu
 JOIN Rehberler ON SatislarTablosu.RehberID = Rehberler.RehberID
 WHERE MONTH(Tarih) = 8
 GROUP BY Rehberler.RehberAdi
 ORDER BY CalismaSayisi DESC
 
---3.Kadýn turistlerin gezdiði yerleri, toplam ziyaret edilme sayýlarýyla beraber listeleyin.
+--3.Kadin turistlerin gezdiÃ°i yerleri, toplam ziyaret edilme sayilariyla beraber listeleyin.
 SELECT BolgeAdi, COUNT(SatislarTablosu.TuristID) as ZiyaretEdilmeSayisi
 FROM Bolgeler
 INNER JOIN SatislarTablosu ON Bolgeler.BolgeID = SatislarTablosu.BolgeID1 OR Bolgeler.BolgeID = SatislarTablosu.BolgeID2 OR Bolgeler.BolgeID = SatislarTablosu.BolgeID3
 INNER JOIN Turistler ON Turistler.TuristID = SatislarTablosu.TuristID
-WHERE Turistler.Cinsiyet = 'Kadýn'
+WHERE Turistler.Cinsiyet = 'KadÃ½n'
 GROUP BY BolgeAdi
 ORDER BY ZiyaretEdilmeSayisi DESC;
 
---4. Ýngiltere’den gelip de Kýz Kulesi’ni gezen turistler kimlerdir?
+--4. Ingiltereâ€™den gelip de Kiz Kulesiâ€™ni gezen turistler kimlerdir?
 SELECT t.TuristAdi, t.TuristSoyadi
 FROM Turistler t
 JOIN SatislarTablosu s ON t.TuristID = s.TuristID
 JOIN Turlar tr ON s.TurID = tr.TurID
-WHERE t.GelenUlke = 'English' AND tr.BolgeID1 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'Kýz Kulesi')
-OR tr.BolgeID2 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'Kýz Kulesi')
-OR tr.BolgeID3 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'Kýz Kulesi')
+WHERE t.GelenUlke = 'English' AND tr.BolgeID1 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'KÃ½z Kulesi')
+OR tr.BolgeID2 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'KÃ½z Kulesi')
+OR tr.BolgeID3 = (SELECT BolgeID FROM Bolgeler WHERE BolgeAdi = 'KÃ½z Kulesi')
 
---5. Gezilen yerler hangi yýlda kaç defa gezilmiþtir?
+--5. Gezilen yerler hangi yÃ½lda kaÃ§ defa gezilmistir?
 SELECT COUNT(SatislarTablosu.TurID) as 'Tour Count',Yillar.Yil as 'Year', Bolgeler.BolgeAdi as 'Region Name'
 FROM SatislarTablosu
 JOIN Turlar ON SatislarTablosu.TurID = Turlar.TurID
@@ -40,7 +40,7 @@ JOIN (SELECT DISTINCT YEAR(Tarih) as Yil FROM SatislarTablosu) as Yillar ON YEAR
 GROUP BY Yillar.Yil, Bolgeler.BolgeAdi
 ORDER BY Yillar.Yil, 'Tour Count' DESC;
 
---6. 2’den fazla tura rehberlik eden rehberlerin en çok tanýttýklarý yerler nelerdir?
+--6. 2â€™den fazla tura rehberlik eden rehberlerin en Ã§ok tanittiklari yerler nelerdir?
 SELECT RehberAdi, RehberSoyadi, COUNT(TurID) AS "Tur Sayisi", GROUP_CONCAT(DISTINCT BolgeAdi) AS "En Cok Tanittigi Yerler"
 FROM Rehberler
 JOIN Turlar ON Rehberler.RehberID = Turlar.RehberID
@@ -48,7 +48,7 @@ JOIN Bolgeler ON Turlar.BolgeID1 = Bolgeler.BolgeID OR Turlar.BolgeID2 = Bolgele
 GROUP BY Rehberler.RehberID
 HAVING COUNT(TurID) > 2
 ORDER BY COUNT(TurID) DESC
---7.Ýtalyan turistler en çok nereyi gezmiþtir? 
+--7.Italyan turistler en Ã§ok nereyi gezmistir? 
 SELECT b.BolgeAdi, COUNT(*) as "Ziyaret Sayisi"
 FROM SatislarTablosu s
 JOIN Turlar t ON s.TurID = t.TurID
@@ -58,17 +58,17 @@ WHERE tr.GelenUlke = 'Italy'
 GROUP BY b.BolgeAdi
 ORDER BY "Ziyaret Sayisi" ASC
 
---8.Kapalý Çarþý'yý gezen en yaþlý turist kimdir? 
+--8.Kapali Ã‡arsi'yi gezen en yasli turist kimdir? 
 SELECT tr.TuristAdi, tr.TuristSoyadi, tr.DogumTarihi
 FROM SatislarTablosu s
 JOIN Turlar t ON s.TurID = t.TurID
 JOIN Bolgeler b ON t.BolgeID1 = b.BolgeID OR t.BolgeID2 = b.BolgeID OR t.BolgeID3 = b.BolgeID  
 JOIN Turistler tr ON s.TuristID = tr.TuristID
-WHERE b.BolgeAdi = 'Kapalý Çarþý'
+WHERE b.BolgeAdi = 'KapalÃ½ Ã‡arÃ¾Ã½'
 ORDER BY tr.DogumTarihi ASC
 
 
---9.Yunanistan'dan gelen Finlandiyalý turistin gezdiði yerler nerelerdir?
+--9.Yunanistan'dan gelen Finlandiyali turistin gezdigi yerler nerelerdir?
 SELECT b.BolgeAdi,TuristAdSoyad
 FROM SatislarTablosu s
 JOIN Turlar t ON s.TurID = t.TurID
@@ -77,12 +77,12 @@ JOIN Turistler tr ON s.TuristID = tr.TuristID
 WHERE tr.Uyruk = 'Finnish' AND tr.GelenUlke = 'Greek'
 GROUP BY b.BolgeAdi,TuristAdSoyad
 
---10.Dolmabahçe Sarayý’na en son giden turistler ve rehberi listeleyin.
+--10.DolmabahÃ§e Sarayiâ€™na en son giden turistler ve rehberi listeleyin.
 SELECT tr.TuristAdi, tr.TuristSoyadi, r.RehberAdi, r.RehberSoyadi
 FROM SatislarTablosu s
 JOIN Turlar t ON s.TurID = t.TurID
 JOIN Bolgeler b ON t.BolgeID1 = b.BolgeID OR t.BolgeID2 = b.BolgeID OR t.BolgeID3 = b.BolgeID
 JOIN Turistler tr ON s.TuristID = tr.TuristID
 JOIN Rehberler r ON s.RehberID = r.RehberID
-WHERE b.BolgeAdi = 'Dolmabahce Sarayý'
+WHERE b.BolgeAdi = 'Dolmabahce SarayÃ½'
 ORDER BY s.Tarih DESC
